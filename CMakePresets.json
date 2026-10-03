@@ -1,0 +1,55 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": { "major": 3, "minor": 20, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "default",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
+      "name": "vs2022",
+      "displayName": "Visual Studio 2022 (x64)",
+      "description": "Generate a Visual Studio solution",
+      "inherits": "default",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Release"
+      }
+    },
+    {
+      "name": "vs2026",
+      "displayName": "Visual Studio 2026 (x64)",
+      "description": "Generate a Visual Studio solution",
+      "inherits": "default",
+      "generator": "Visual Studio 18 2026",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Release"
+      }
+    },
+    {
+      "name": "mingw",
+      "displayName": "Windows x64 (mingw-w64 cross-compile)",
+      "description": "Optional, Linux host only: build for Windows to catch Windows-only breakage. Requires mingw-w64-gcc. Nothing in the default preset depends on this.",
+      "inherits": "default",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-mingw-static",
+        "VCPKG_HOST_TRIPLET": "x64-linux",
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/x86_64-w64-mingw32.cmake"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "default", "configurePreset": "default" },
+    { "name": "vs2022", "configurePreset": "vs2022", "configuration": "Release" },
+    { "name": "mingw", "configurePreset": "mingw" }
+  ]
+}

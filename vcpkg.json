@@ -1,0 +1,25 @@
+{
+  "name": "pa1-loadbalance",
+  "version": "0.1.0",
+  "builtin-baseline": "b9a5010d499952121b0f1a40eb98963c37da32dc",
+  "dependencies": [
+    "glm",
+  	{
+			"name": "imgui",
+			"default-features": false,
+			"features": [
+				"glfw-binding",
+				"opengl3-binding"
+			]
+		},
+		"glad",
+		"glfw3",
+		{
+			"name": "glfw3",
+			"features": [
+				"wayland"
+			],
+			"platform": "linux"
+		}
+  ]
+}

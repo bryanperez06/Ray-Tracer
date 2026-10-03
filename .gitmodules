@@ -1,0 +1,3 @@
+[submodule "tira"]
+	path = tira
+	url = https://codeberg.org/stimlab/tira.git

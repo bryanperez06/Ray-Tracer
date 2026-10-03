@@ -1,0 +1,28 @@
+# Visual Studio
+.vs/
+**/.vs/
+
+# Build output
+build/
+x64/
+Debug/
+Release/
+
+# Visual Studio generated files
+*.suo
+*.user
+*.VC.db
+*.VC.opendb
+*.ipch
+*.pdb
+*.obj
+*.ilk
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# ImGui
+imgui.ini
