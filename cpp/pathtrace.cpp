@@ -35,8 +35,10 @@ struct sphere {
 };
 
 std::vector<sphere> groupOfSpheres;
-
-
+std::vector<glm::vec3> accumulation_buffer;
+size_t pass_count = 0;
+glm::vec3 prevCameraPosition;
+float prevFOV;
 /* hitSphere calculates how a ray intersects with a sphere returns a boolean true if theres an intersection*/
 bool hitSphere(glm::vec3 centerPos, float radius, glm::vec3 direction, glm::vec3 start, float& t) {
     glm::vec3 originToSphere = centerPos - start;
@@ -133,6 +135,11 @@ void InitializePathTracer() {
     image_buffer.resize(pow(2, s_exp) * pow(2, s_exp) * 3);
     std::fill(image_buffer.begin(), image_buffer.end(), 0);
   }
+
+  size_t s = std::pow(2, s_exp);
+  accumulation_buffer.resize(s * s, glm::vec3(0.0f));
+  prevCameraPosition = camera.Position();
+  prevFOV = camera.FieldOfView();
 }
 
 
@@ -150,6 +157,25 @@ void UpdatePathTracer() {
   size_t s = std::pow(2, s_exp);
   float dx = 1.0f / s;
 
+  glm::vec3 currentCameraPosition = camera.Position();
+  float currentFOV = camera.FieldOfView();
+
+  if (currentCameraPosition != prevCameraPosition ||
+      currentFOV != prevFOV) {
+
+      std::fill(
+          accumulation_buffer.begin(),
+          accumulation_buffer.end(),
+          glm::vec3(0.0f)
+      );
+
+      pass_count = 0;
+
+      prevCameraPosition = currentCameraPosition;
+      prevFOV = currentFOV;
+  }
+
+  pass_count++;
   // iterate across all pixels in the image buffer
   for (size_t yi = 0; yi < s; yi++) {
     for (size_t xi = 0; xi < s; xi++) {
@@ -168,7 +194,7 @@ void UpdatePathTracer() {
       while (glm::length(throughput) >= 0.1f && bounceCount < 10) {
 
 
-          float closestT = std::numeric_limits<double>::infinity();
+          float closestT = std::numeric_limits<float>::infinity();
           int closestSphere = -1;
 
           for (int i = 0; i < groupOfSpheres.size(); i++) {
@@ -219,9 +245,25 @@ void UpdatePathTracer() {
           bounceCount = bounceCount + 1;
       }
 
-      image_buffer[yi * s * 3 + xi * 3 + 0] = color[0] * 255;
-      image_buffer[yi * s * 3 + xi * 3 + 1] = color[1] * 255;
-      image_buffer[yi * s * 3 + xi * 3 + 2] = color[2] * 255;
+      size_t pixelIndex = yi * s + xi;
+
+      accumulation_buffer[pixelIndex] += color;
+      glm::vec3 averageColor =
+          accumulation_buffer[pixelIndex] / float(pass_count);
+
+      averageColor = glm::clamp(
+          averageColor,
+          glm::vec3(0.0f),
+          glm::vec3(1.0f)
+      );
+
+
+      image_buffer[yi * s * 3 + xi * 3 + 0] = static_cast<unsigned char>(averageColor[0] * 255);
+
+      image_buffer[yi * s * 3 + xi * 3 + 1] =  static_cast<unsigned char>(averageColor[1] * 255);
+
+      image_buffer[yi * s * 3 + xi * 3 + 2] = static_cast<unsigned char>(averageColor[2] * 255);
+
     }
   }
 }
